@@ -1,0 +1,7 @@
+{
+  "renderer": "existing_ds_3ds_v2",
+  "source_sha256": "81d7d497d41a2ce327228dbb2804b57321bf5d745ca25afda5b64c96a0916663",
+  "title": "Flappy Bird",
+  "platform": "nds",
+  "theme": "dark"
+}
