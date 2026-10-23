@@ -1,0 +1,110 @@
+[
+  {
+    "platform": "gb",
+    "igdb_id": 1129,
+    "name": "Castlevania Legends",
+    "lossless_png_bytes": 1128415,
+    "webp": [
+      {
+        "quality": 92,
+        "bytes": 168730,
+        "psnr_light_dark_db": [
+          41.86,
+          41.857
+        ],
+        "alpha_exact": true
+      },
+      {
+        "quality": 90,
+        "bytes": 146438,
+        "psnr_light_dark_db": [
+          40.992,
+          40.99
+        ],
+        "alpha_exact": true
+      },
+      {
+        "quality": 88,
+        "bytes": 130152,
+        "psnr_light_dark_db": [
+          40.24,
+          40.239
+        ],
+        "alpha_exact": true
+      }
+    ],
+    "selected_quality": 92
+  },
+  {
+    "platform": "gba",
+    "igdb_id": 49542,
+    "name": "Dan Doh!! Tobase Shouri no Smile Shot",
+    "lossless_png_bytes": 595862,
+    "webp": [
+      {
+        "quality": 92,
+        "bytes": 105124,
+        "psnr_light_dark_db": [
+          43.913,
+          43.908
+        ],
+        "alpha_exact": true
+      },
+      {
+        "quality": 90,
+        "bytes": 96922,
+        "psnr_light_dark_db": [
+          43.217,
+          43.213
+        ],
+        "alpha_exact": true
+      },
+      {
+        "quality": 88,
+        "bytes": 88842,
+        "psnr_light_dark_db": [
+          42.33,
+          42.326
+        ],
+        "alpha_exact": true
+      }
+    ],
+    "selected_quality": 92
+  },
+  {
+    "platform": "snes",
+    "igdb_id": 259651,
+    "name": "Worldwide Soccer",
+    "lossless_png_bytes": 612874,
+    "webp": [
+      {
+        "quality": 92,
+        "bytes": 97268,
+        "psnr_light_dark_db": [
+          45.634,
+          45.638
+        ],
+        "alpha_exact": true
+      },
+      {
+        "quality": 90,
+        "bytes": 88818,
+        "psnr_light_dark_db": [
+          44.689,
+          44.69
+        ],
+        "alpha_exact": true
+      },
+      {
+        "quality": 88,
+        "bytes": 81726,
+        "psnr_light_dark_db": [
+          43.742,
+          43.743
+        ],
+        "alpha_exact": true
+      }
+    ],
+    "selected_quality": 92
+  }
+]

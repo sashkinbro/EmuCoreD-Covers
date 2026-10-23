@@ -1,0 +1,4 @@
+# Keep manifest digests identical to the validated release snapshot.
+platforms/**/index.json -text whitespace=cr-at-eol
+*.jpg -text
+*.webp -text

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.part
+reports/*.log
+reports/release-snapshots/
+reports/*-release-paths.txt

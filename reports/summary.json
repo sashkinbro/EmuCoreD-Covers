@@ -1,0 +1,10 @@
+{
+  "gamecube": {
+    "catalog_games": 932,
+    "igdb_cover_available": 905,
+    "complete_assets": 605,
+    "missing_igdb_cover": 27,
+    "assets_pending": 300,
+    "serials": 0
+  }
+}

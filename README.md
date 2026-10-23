@@ -1,6 +1,28 @@
 # EmuCoreD-Covers
 
-Universal ultra-high-definition game cover repository for **EmuCoreD** (Nintendo 3DS, Nintendo DS & Nintendo DSi emulator for Android).
+IGDB game artwork repository for **EmuCoreD**, covering Nintendo DS/DSi,
+Nintendo 3DS/New Nintendo 3DS, GameCube, Wii, Game Boy Advance, Game Boy,
+Game Boy Color, NES and SNES.
+
+## Platform-scoped catalog
+
+The nine separate `platforms/<platform>/index.json` manifests provide source
+IGDB images plus transparent light and dark 3D cases. The platform keys are
+`nds`, `n3ds`, `gamecube`, `wii`, `gba`, `gb`, `gbc`, `nes` and `snes`.
+Only complete flat/light/dark sets appear in these ready manifests.
+`catalogs/` preserves the full source metadata, including records without IGDB
+cover artwork. Current coverage and missing-data reasons are in
+`reports/summary.json` and the per-platform missing reports.
+
+Every artifact has a SHA256 digest and original IGDB image provenance. Artwork
+region remains unspecified where IGDB does not identify it. Platform titles and
+ambiguous candidates stay isolated; an identical title on two consoles does not
+imply the same release. Square and landscape scans retain their proportions in
+the new case profiles. No replacement artwork is generated for missing scans.
+
+See [pipeline instructions](tools/README.md) for checkpointing, reproducible
+acquisition/rendering, metadata limitations and validation. The original combined
+index and `covers/` assets below remain available at their existing paths.
 
 ## Content
 - **1080p High-Resolution 2D Covers (`covers/`)**: 6067 covers at maximum IGDB fidelity

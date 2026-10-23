@@ -1,0 +1,11 @@
+{
+  "platform": "gamecube",
+  "complete_sets": 605,
+  "catalog_games": 932,
+  "source_cover_available": 905,
+  "missing_igdb_cover": 27,
+  "assets_pending": 300,
+  "index_sha256": "6c6ab3a2d2d478765aeb1fb3b5ea355540ebd4ad1c7970cfa3cde17f67cd1ec9",
+  "source_failures": 0,
+  "scope": "Initial coherent ready batch; full catalog acquisition complete; remaining variants being generated."
+}

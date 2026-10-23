@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "total_complete_sets": 605,
+  "platform_counts": {
+    "gamecube": 605
+  },
+  "index_sha256": {
+    "gamecube": "6c6ab3a2d2d478765aeb1fb3b5ea355540ebd4ad1c7970cfa3cde17f67cd1ec9"
+  },
+  "validated_at": "2026-10-23T20:48:45Z",
+  "checks": [
+    "full_image_decode",
+    "sha256",
+    "original_igdb_source",
+    "exact_platform_membership",
+    "complete_catalog_pagination",
+    "transparent_840x1080_variants",
+    "distinct_light_dark",
+    "ambiguous_title_safety"
+  ]
+}

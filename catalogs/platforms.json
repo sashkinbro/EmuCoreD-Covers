@@ -1,0 +1,55 @@
+{
+  "source": "https://api.igdb.com/v4/platforms",
+  "platforms": [
+    {
+      "id": 24,
+      "name": "Game Boy Advance",
+      "slug": "gba"
+    },
+    {
+      "id": 20,
+      "name": "Nintendo DS",
+      "slug": "nds"
+    },
+    {
+      "id": 18,
+      "name": "Nintendo Entertainment System",
+      "slug": "nes"
+    },
+    {
+      "id": 22,
+      "name": "Game Boy Color",
+      "slug": "gbc"
+    },
+    {
+      "id": 21,
+      "name": "Nintendo GameCube",
+      "slug": "ngc"
+    },
+    {
+      "id": 33,
+      "name": "Game Boy",
+      "slug": "gb"
+    },
+    {
+      "id": 137,
+      "name": "New Nintendo 3DS",
+      "slug": "new-3ds"
+    },
+    {
+      "id": 37,
+      "name": "Nintendo 3DS",
+      "slug": "3ds"
+    },
+    {
+      "id": 5,
+      "name": "Wii",
+      "slug": "wii"
+    },
+    {
+      "id": 19,
+      "name": "Super Nintendo Entertainment System",
+      "slug": "snes"
+    }
+  ]
+}
