@@ -1,0 +1,7 @@
+{
+  "renderer": "source_aspect_geometry_v3",
+  "source_sha256": "5009492de5eed0dc9412e4ff9ff8c6a5c8ba3e4c242f1345f63da728ad4f4130",
+  "title": "GameBoy Wordle",
+  "platform": "gb",
+  "theme": "dark"
+}
