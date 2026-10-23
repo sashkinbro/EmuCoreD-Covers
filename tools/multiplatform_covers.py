@@ -10,6 +10,7 @@ import argparse
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 import hashlib
+from functools import lru_cache
 import importlib.util
 import json
 import os
@@ -34,7 +35,7 @@ PLATFORMS = {'nds': (20, 'Nintendo DS'), 'n3ds': (37, 'Nintendo 3DS'),
  'gbc': (22, 'Game Boy Color'), 'nes': (18, 'Nintendo Entertainment System'),
  'snes': (19, 'Super Nintendo Entertainment System')}
 def platform_ids(key):
-    return (37,137) if key=='n3ds' else (PLATFORMS[key][0],)
+    return {'n3ds':(37,137),'nes':(18,99),'snes':(19,58)}.get(key,(PLATFORMS[key][0],))
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT if (ROOT / 'index.min.json').exists() else ROOT / 'covers'
 
@@ -47,6 +48,107 @@ def atomic_json(path, data):
 def digest(path):
     with path.open('rb') as stream:
         return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+@lru_cache(maxsize=8)
+def legacy_profiles(out):
+    path=Path(out)/'reports'/'legacy-case-profiles.json'
+    return json.loads(path.read_text(encoding='utf8')).get('profiles',{}) if path.exists() else {}
+
+def eligible_legacy(out,key,game):
+    if key not in ('nds','n3ds'):
+        return False
+    profile=legacy_profiles(str(out.resolve())).get(str(game['id']),{})
+    if profile.get('renderer')!=key:
+        return False
+    for field,folder in [('sha256_3d','3d'),('sha256_3d_dark','3d/dark')]:
+        path=out/'covers'/folder/(str(game['id'])+'.webp')
+        if not path.exists() or digest(path)!=profile.get(field):
+            return False
+    return True
+
+def actual_flat(out,key,gid):
+    path=out/'platforms'/key/'flat'/(str(gid)+'.jpg')
+    metadata=path.with_suffix('.source.json')
+    if metadata.exists():
+        record=json.loads(metadata.read_text(encoding='utf8'))
+        if record.get('local_path')=='covers/'+str(gid)+'.jpg':
+            return out/record['local_path']
+    return path
+
+def renderer_version(key,source):
+    if key in ('nds','n3ds'):
+        return 'existing_ds_3ds_v2'
+    with Image.open(source) as image:
+        return 'source_aspect_wide_spine_v4' if image.width/image.height>4 else 'source_aspect_geometry_v3'
+
+def audit_legacy(args):
+    import numpy as np
+    from render_nds_covers_3d import render_nds_3d
+    from render_n3ds_covers_3d import render_n3ds_3d
+    crop=(50,35,110,150)
+    white=Image.new('RGB',(800,1110),'white')
+    templates={(key,theme):np.asarray(renderer(white,'','',theme=theme).crop(crop).convert('RGB'),dtype=float)
+      for key,renderer in [('nds',render_nds_3d),('n3ds',render_n3ds_3d)] for theme in ('light','dark')}
+    ids=set()
+    for key in ('nds','n3ds'):
+        data=json.loads((args.out/'catalogs'/(key+'.json')).read_text(encoding='utf8'))
+        ids.update(str(g['id']) for g in data['games'] if image_url(g))
+    def inspect(gid):
+        profile={}; guesses=[]
+        try:
+            for theme,folder,field in [('light','3d','sha256_3d'),('dark','3d/dark','sha256_3d_dark')]:
+                path=args.out/'covers'/folder/(gid+'.webp')
+                with Image.open(path) as image:
+                    assert image.size==(840,1080) and image.mode=='RGBA'
+                    pixels=np.asarray(image.crop(crop).convert('RGB'),dtype=float)
+                distances={key:float(np.mean((pixels-templates[(key,theme)])**2)) for key in ('nds','n3ds')}
+                ordered=sorted(distances,key=distances.get)
+                guesses.append(ordered[0] if distances[ordered[0]]<3000 and distances[ordered[0]]<.65*distances[ordered[1]] else 'unknown')
+                profile[field]=digest(path)
+                profile['signature_mse_'+theme]=distances
+            profile['renderer']=guesses[0] if guesses[0]==guesses[1] else 'unknown'
+            return gid,profile
+        except (OSError,AssertionError):
+            return gid,None
+    profiles={}
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for gid,profile in pool.map(inspect,sorted(ids,key=int)):
+            if profile:
+                profiles[gid]=profile
+    counts={key:sum(p['renderer']==key for p in profiles.values()) for key in ('nds','n3ds','unknown')}
+    atomic_json(args.out/'reports'/'legacy-case-profiles.json',{'method':'fixed top-spine pixel signature against existing DS/3DS renderers, both light and dark; uncertain profiles are not reused','counts':counts,'profiles':profiles})
+    print(json.dumps(counts),flush=True)
+
+def deduplicate_legacy(args):
+    removed=0; saved=0; reused_sources=0; reused_sets=0
+    for key in ('nds','n3ds'):
+        catalog=json.loads((args.out/'catalogs'/(key+'.json')).read_text(encoding='utf8'))
+        managed=(args.out/'platforms'/key).resolve()
+        for game in catalog['games']:
+            gid=str(game['id']); source=args.out/'covers'/(gid+'.jpg')
+            metadata=managed/'flat'/(gid+'.source.json')
+            if not metadata.exists() or not source.exists():
+                continue
+            record=json.loads(metadata.read_text(encoding='utf8'))
+            if record['source_url']!=image_url(game) or digest(source)!=record['sha256']:
+                continue
+            record['local_path']='covers/'+gid+'.jpg'
+            atomic_json(metadata,record)
+            reused_sources+=1
+            candidates=[managed/'flat'/(gid+'.jpg')]
+            if eligible_legacy(args.out,key,game):
+                reused_sets+=1
+                candidates.extend(managed/folder/(gid+'.webp') for folder in ('3d','3d/dark'))
+            for path in candidates:
+                resolved=path.resolve()
+                assert resolved.is_relative_to(managed), 'Refusing to remove a file outside its managed platform'
+                if path.exists():
+                    saved+=path.stat().st_size
+                    path.unlink()
+                    removed+=1
+    atomic_json(args.out/'reports'/'legacy-reuse.json',{'reused_sources':reused_sources,'reused_complete_sets':reused_sets,'duplicate_files_removed':removed,'duplicate_bytes_removed':saved,'original_combined_assets_modified':0})
+    indexes(args)
+    print('Removed',removed,'generated duplicates;',saved,'bytes; original assets remain unchanged.',flush=True)
 
 def normalize(title):
     title = title.replace('+', ' plus ')
@@ -112,12 +214,15 @@ def ensure_flat(task):
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         origin=path.with_suffix('.source.json')
-        if path.exists() and origin.exists():
+        if origin.exists():
             try:
                 metadata=json.loads(origin.read_text(encoding='utf8'))
-                with Image.open(path) as im:
+                cached=path
+                if metadata.get('local_path')=='covers/'+str(game['id'])+'.jpg':
+                    cached=path.parents[3]/metadata['local_path']
+                with Image.open(cached) as im:
                     im.verify()
-                if metadata['source_url']==image_url(game) and metadata['sha256']==digest(path):
+                if metadata['source_url']==image_url(game) and metadata['sha256']==digest(cached):
                     return game['id'], True
             except Exception:
                 pass
@@ -173,7 +278,15 @@ def generic_render(art, title, platform, theme):
     ImageDraw.Draw(label).text((15,28), title, font=font, fill=text)
     bbox = label.getbbox()
     if bbox:
-        label = ImageOps.contain(label.crop(bbox).rotate(90, expand=True), (70,max(1,physical_h-250)), Image.Resampling.LANCZOS)
+        # Panorama scans need proportional header/footer reserves; a fixed250px
+        # reserve leaves only11px and Pillow rounds the title width to zero.
+        max_title_h=max(1,physical_h-(150 if ratio>4 else 250))
+        label=label.crop(bbox).rotate(90,expand=True)
+        scale=min(70/label.width,max_title_h/label.height)
+        if ratio>4:
+            label=label.resize((max(1,round(label.width*scale)),max(1,round(label.height*scale))),Image.Resampling.LANCZOS)
+        else:
+            label=ImageOps.contain(label,(70,max_title_h),Image.Resampling.LANCZOS)
         spine.alpha_composite(label, ((105-label.width)//2,(physical_h-label.height)//2))
     header={'gamecube':['NINTENDO','GAMECUBE'],'wii':['Nintendo','Wii'],'gba':['GAME BOY','ADVANCE'],
       'gb':['GAME BOY'],'gbc':['GAME BOY','COLOR'],'nes':['NINTENDO','NES'],'snes':['SUPER','NINTENDO']}[platform]
@@ -198,16 +311,19 @@ def render(task):
     key, game, out = task
     gid = str(game['id'])
     base = out / 'platforms' / key
-    flat = base / 'flat' / (gid+'.jpg')
+    flat = actual_flat(out,key,gid)
     try:
         legacy_flat=out/'covers'/(gid+'.jpg')
-        reuse_legacy=key in ('nds','n3ds') and legacy_flat.exists() and digest(legacy_flat)==digest(flat)
+        reuse_legacy=eligible_legacy(out,key,game) and legacy_flat.exists() and digest(legacy_flat)==digest(flat)
         with Image.open(flat) as art:
             for theme, folder in [('light','3d'),('dark','3d/dark')]:
                 path = base / folder / (gid+'.webp')
                 render_state=path.with_suffix('.render.json')
-                version='existing_ds_3ds_v1' if key in ('nds','n3ds') else 'source_aspect_geometry_v3'
+                version=renderer_version(key,flat)
                 signature={'renderer':version,'source_sha256':digest(flat),'title':game['name'],'platform':key,'theme':theme}
+                legacy=out/'covers'/folder/(gid+'.webp')
+                if reuse_legacy:
+                    path=legacy
                 if path.exists() and render_state.exists():
                     try:
                         if json.loads(render_state.read_text(encoding='utf8'))==signature:
@@ -217,13 +333,13 @@ def render(task):
                     except (OSError,ValueError):
                         pass
                 path.parent.mkdir(parents=True, exist_ok=True)
-                legacy=out/'covers'/folder/(gid+'.webp')
                 if reuse_legacy and legacy.exists():
                     with Image.open(legacy) as old:
                         valid=old.size==(840,1080) and old.mode=='RGBA'
                         old.verify()
                     if valid:
-                        shutil.copy2(legacy,path)
+                        if legacy!=path:
+                            shutil.copy2(legacy,path)
                         atomic_json(render_state,signature)
                         continue
                 if key == 'nds':
@@ -289,6 +405,7 @@ def assets(args):
                 indexes(args)
     atomic_json(args.out/'reports'/'render-errors.json',errors)
     indexes(args)
+    atomic_json(args.out/'reports'/'progress.json',{'phase':'complete' if not errors else 'complete_with_errors','completed':len(ready),'total':len(ready),'errors':len(errors),'updated_at':time.time()})
 
 def seed_matches(args):
     """Filename identity is retained; only unambiguous exact canonical/alias matches map."""
@@ -327,14 +444,26 @@ def indexes(args):
         for game in catalog['games']:
             gid=str(game['id']); base='platforms/'+key+'/'
             paths={'path':base+'flat/'+gid+'.jpg','path_3d':base+'3d/'+gid+'.webp','path_3d_dark':base+'3d/dark/'+gid+'.webp'}
-            renderer='existing_ds_3ds_v1' if key in ('nds','n3ds') else 'source_aspect_geometry_v3'
+            source_path=actual_flat(args.out,key,gid)
+            if not source_path.exists():
+                missing.append({'igdb_id':game['id'],'name':game['name'],'reason':'no_igdb_cover' if not image_url(game) else 'assets_pending'})
+                continue
+            renderer=renderer_version(key,source_path)
+            if key in ('nds','n3ds'):
+                old_flat=args.out/'covers'/(gid+'.jpg')
+                if source_path.exists() and old_flat.exists() and digest(source_path)==digest(old_flat):
+                    paths['path']='covers/'+gid+'.jpg'
+                    if eligible_legacy(args.out,key,game):
+                        paths['path_3d']='covers/3d/'+gid+'.webp'
+                        paths['path_3d_dark']='covers/3d/dark/'+gid+'.webp'
             complete=all((args.out/path).exists() for path in paths.values())
             if complete:
                 try:
-                    origin=json.loads((args.out/paths['path']).with_suffix('.source.json').read_text(encoding='utf8'))
+                    origin=json.loads((args.out/base/'flat'/(gid+'.source.json')).read_text(encoding='utf8'))
                     complete=origin['source_url']==image_url(game) and origin['sha256']==digest(args.out/paths['path'])
                     for field,theme in [('path_3d','light'),('path_3d_dark','dark')]:
-                        state=json.loads((args.out/paths[field]).with_suffix('.render.json').read_text(encoding='utf8'))
+                        state_folder='3d' if theme=='light' else '3d/dark'
+                        state=json.loads((args.out/base/state_folder/(gid+'.render.json')).read_text(encoding='utf8'))
                         complete=complete and state=={'renderer':renderer,'source_sha256':origin['sha256'],'title':game['name'],'platform':key,'theme':theme}
                 except (OSError,ValueError,KeyError):
                     complete=False
@@ -393,7 +522,7 @@ def validate(args):
             assert game['igdb_platform_id'] in game['igdb_platform_ids']
             assert game['source_url']==image_url(membership[gid])
             for field in ('path','path_3d','path_3d_dark'):
-                assert game[field].startswith('platforms/'+key+'/')
+                assert game[field].startswith('platforms/'+key+'/') or (key in ('nds','n3ds') and game[field] in ('covers/'+gid+'.jpg','covers/3d/'+gid+'.webp','covers/3d/dark/'+gid+'.webp'))
                 path=args.out/game[field]
                 assert digest(path)==game['sha256'+field.removeprefix('path')]
                 with Image.open(path) as image:
@@ -465,7 +594,7 @@ def release_scope(args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['catalog','assets','index','validate','contact-sheet','scope'])
+    parser.add_argument('command',choices=['catalog','assets','index','validate','contact-sheet','scope','audit-legacy','deduplicate-legacy'])
     parser.add_argument('--out',type=Path,default=DEFAULT_OUT)
     parser.add_argument('--config',type=Path,default=ROOT/'IGDB'/'config.py')
     parser.add_argument('--seeds',type=Path,default=Path('E:/nINtENDO'))
@@ -478,7 +607,7 @@ def main():
     parser.add_argument('--download-only',action='store_true')
     parser.add_argument('--checkpoint-every',type=int,default=1000)
     args=parser.parse_args()
-    {'catalog':catalog,'assets':assets,'index':indexes,'validate':validate,'contact-sheet':contact_sheet,'scope':release_scope}[args.command](args)
+    {'catalog':catalog,'assets':assets,'index':indexes,'validate':validate,'contact-sheet':contact_sheet,'scope':release_scope,'audit-legacy':audit_legacy,'deduplicate-legacy':deduplicate_legacy}[args.command](args)
 
 if __name__=='__main__':
     main()

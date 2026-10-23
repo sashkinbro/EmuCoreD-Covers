@@ -4,3 +4,4 @@ __pycache__/
 reports/*.log
 reports/release-snapshots/
 reports/*-release-paths.txt
+reports/seed-matches.json

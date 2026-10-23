@@ -2,7 +2,7 @@
 
 IGDB game artwork repository for **EmuCoreD**, covering Nintendo DS/DSi,
 Nintendo 3DS/New Nintendo 3DS, GameCube, Wii, Game Boy Advance, Game Boy,
-Game Boy Color, NES and SNES.
+Game Boy Color, NES/Family Computer and SNES/Super Famicom.
 
 ## Platform-scoped catalog
 

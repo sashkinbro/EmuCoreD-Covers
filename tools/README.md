@@ -2,7 +2,7 @@
 
 `multiplatform_covers.py` exhaustively pages IGDB by increasing ID, round robin across
 Nintendo DS (20), Nintendo 3DS/New Nintendo 3DS (37/137), GameCube (21), Wii (5), GBA (24), GB (33),
-GBC (22), NES (18) and SNES (19). IDs were checked against the live IGDB platforms
+GBC (22), NES/Family Computer (18/99) and SNES/Super Famicom (19/58). IDs were checked against the live IGDB platforms
 endpoint. The separate original combined index and assets remain available.
 
 Use Python 3.11+ and install Pillow and numpy (verified with Pillow 12.3.0 and
@@ -19,8 +19,10 @@ From this repository:
 
 ```powershell
 python tools/multiplatform_covers.py catalog --config C:/path/to/private/config.py
-python tools/multiplatform_covers.py assets --workers 16 --render-workers 6
 python tools/multiplatform_covers.py assets --download-only --workers 16
+python tools/multiplatform_covers.py audit-legacy
+python tools/multiplatform_covers.py assets --workers 16 --render-workers 6
+python tools/multiplatform_covers.py deduplicate-legacy
 python tools/multiplatform_covers.py validate
 python tools/multiplatform_covers.py contact-sheet
 python tools/multiplatform_selftest.py
@@ -54,6 +56,11 @@ verified ROM identification database.
 - `platforms/<platform>/index.json`: only complete verified flat/light/dark sets.
   `games` is keyed by IGDB ID and includes paths, SHA256 for all three artifacts,
   original IGDB 1080p URL/image ID, release/version metadata and renderer identity.
+  Exact-byte legacy DS/3DS sources can reference existing `covers/` paths. Their
+  3D variants are reused only when an audited light/dark spine signature matches
+  the target console. Shared DS/3DS IDs receive separate variants when needed;
+  original assets remain unchanged. The source checkpoint records `local_path`
+  when a byte-identical original is reused; duplicate generated files are removed.
 - `titles`: only unambiguous normalized canonical titles and aliases. Normalization
   preserves `+` as `plus` so ROM hacks do not collide with original titles.
 - `title_candidates`: arrays retain every ambiguous mapping for explicit client
@@ -81,3 +88,15 @@ pagination and safe ambiguity handling. It also checks that light and dark
 renders differ. The generated contact sheet provides visual review of all nine
 systems. Existing DS/3DS rendered assets are reused only when their corresponding
 flat bytes exactly match the newly fetched IGDB source and the WebP is valid.
+The legacy profile audit adds a target-console spine-signature check to this
+reuse rule. `multiplatform_stage_validate.py --platform <key>` verifies the exact
+Git index snapshot and every referenced artifact/provenance blob before a release
+commit. `scope` emits per-platform ready-path lists and byte counts; snapshots and
+path lists are local release preparation files and are ignored by Git.
+
+Publish coherent platform batches below GitHub's 2 GiB per-push limit. A release
+snapshot must be frozen while staging: later generator checkpoints must not add
+index references to artifacts outside that commit. Revalidate the staged index,
+not just the changing working copy. Manifest attributes preserve the validated
+snapshot's bytes. Original source images and existing `covers/` assets are never
+rewritten during deduplication.

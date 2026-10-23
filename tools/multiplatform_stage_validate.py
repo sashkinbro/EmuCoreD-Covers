@@ -25,7 +25,8 @@ def main():
             assert stage=='0','Unmerged Git index'
             entries[path]=oid
     def staged_json(path):
-        return json.loads(git('show',':'+path))
+        return metadata_cache[path] if path in metadata_cache else json.loads(git('show',':'+path))
+    metadata_cache={}
     key=args.platform
     index_path=f'platforms/{key}/index.json'
     index_bytes=git('show',':'+index_path)
@@ -34,6 +35,21 @@ def main():
     source={str(game['id']):game for game in catalog['games']}
     assert catalog['catalog_complete']
     referenced={index_path,'catalogs/'+key+'.json'}
+    # One persistent Git process avoids thousands of process launches on Windows.
+    metadata_paths=[f'platforms/{key}/{folder}/{gid}{suffix}' for gid in index['games']
+      for folder,suffix in [('flat','.source.json'),('3d','.render.json'),('3d/dark','.render.json')]]
+    reader=subprocess.Popen(['git','-C',str(args.out),'cat-file','--batch'],stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+    try:
+        for path in metadata_paths:
+            assert path in entries,'Dangling staged provenance: '+path
+            reader.stdin.write((entries[path]+'\n').encode());reader.stdin.flush()
+            header=reader.stdout.readline().decode().split()
+            assert len(header)==3 and header[1]=='blob'
+            payload=reader.stdout.read(int(header[2]));assert reader.stdout.read(1)==b'\n'
+            metadata_cache[path]=json.loads(payload)
+        reader.stdin.close();assert reader.wait()==0
+    finally:
+        if reader.poll() is None: reader.terminate()
     def check(pair):
         gid,game=pair
         assert game['source_url']==image_url(source[gid])

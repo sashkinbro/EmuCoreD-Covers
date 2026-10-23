@@ -36,7 +36,7 @@ class PipelineTests(unittest.TestCase):
 
     def test_physical_box_aspect_changes_on_fixed_transparent_canvas(self):
         boxes=[]
-        for size in ((600,900),(800,800),(1200,600)):
+        for size in ((600,900),(800,800),(1200,600),(1920,414)):
             output=pipeline.generic_render(Image.new('RGB',size,'red'),'Aspect QA','gba','light')
             self.assertEqual(output.size,(840,1080))
             self.assertEqual(output.mode,'RGBA')
@@ -45,6 +45,7 @@ class PipelineTests(unittest.TestCase):
         self.assertLess(boxes[0],.85)
         self.assertTrue(.9<boxes[1]<1.15)
         self.assertGreater(boxes[2],1.6,'Landscape source must produce a landscape physical case')
+        self.assertGreater(boxes[3],3,'Panorama scan must render without zero-size spine text')
 
 
 if __name__=='__main__':
