@@ -1,0 +1,64 @@
+{
+  "batches": [
+    {
+      "platform": "gamecube",
+      "complete_sets": 905,
+      "commit": "9f6134704847f209c1ef23f4b659964437525fea",
+      "index_sha256": "2e23a152855b62a8ccdebab3ac94ffae5573d3c1287de4ad6de28669d951cb7f"
+    },
+    {
+      "platform": "nds",
+      "complete_sets": 3321,
+      "commit": "c462bbd3881b750bc2ff5b9fc2af605386748519",
+      "index_sha256": "f3df66a71c833f919a540b1443e0bbe4824aef1e18af4d5a2dbf39883979db6e"
+    },
+    {
+      "platform": "n3ds",
+      "complete_sets": 2193,
+      "commit": "a3d45ff1d81775cad2c2446b6e46b703f94c7f2a",
+      "index_sha256": "390b8129994a823d872ea19e031e671dda8002298c8317d6cebbe9b1fce3c6bd"
+    },
+    {
+      "platform": "gba",
+      "complete_sets": 2091,
+      "commit": "2c465be487c70bd3617c3b39aaca045a9690688a",
+      "index_sha256": "739209789cab1701e6823033dcf573661958864e6236548b962ea22245ddc170"
+    },
+    {
+      "platform": "gb",
+      "complete_sets": 1449,
+      "commit": "b131911abf055f9d3a708dfffb986980f124824b",
+      "index_sha256": "dda5071405b29897ccfbcccf1cba039be9bf7ebe0e6b43795f9ff6fec3d90153"
+    },
+    {
+      "platform": "gbc",
+      "complete_sets": 1390,
+      "commit": "d0be28e0d35da6c08707bdbbe400f9fb4355cf3a",
+      "index_sha256": "7ab22985e962d66e72df902ce6000f399079683ced6efd1a2a1b2abb0044482c"
+    },
+    {
+      "platform": "nes",
+      "complete_sets": 2528,
+      "commit": "70c7b6bfbcaf357a7f208d5803aeae1ce8eae3f4",
+      "index_sha256": "e8803aec3bfadafa2360f9dacdb9d469a8f97a09a287e663ab9ce206a0671444"
+    },
+    {
+      "platform": "snes",
+      "complete_sets": 2922,
+      "commit": "dd2095a6034306768b00a93408d5868a55fcfbb0",
+      "index_sha256": "69103273ccc15482cf494d887b13f6211a7c863e8e82595cfb267131b760b129"
+    },
+    {
+      "platform": "wii",
+      "complete_sets": 3098,
+      "commit": "8c49da16d11b950b4bcb35b5aba23fd1bceae5d2",
+      "index_sha256": "6223bf524e99f67e41f9a9071be2c3555ac5bca9d53d7310bcd3265287768117"
+    },
+    {
+      "platform": "nds",
+      "complete_sets": 3956,
+      "commit": "36facdeff087ebee3caad43f718a5b238a94874b",
+      "index_sha256": "3597f215a367e71593fd4ad5129b1ea2a820e3fe63b5caf239727471185ebb87"
+    }
+  ]
+}
