@@ -42,6 +42,16 @@
       "slug": "3ds"
     },
     {
+      "id": 99,
+      "name": "Family Computer",
+      "slug": "famicom"
+    },
+    {
+      "id": 159,
+      "name": "Nintendo DSi",
+      "slug": "nintendo-dsi"
+    },
+    {
       "id": 5,
       "name": "Wii",
       "slug": "wii"
@@ -50,6 +60,11 @@
       "id": 19,
       "name": "Super Nintendo Entertainment System",
       "slug": "snes"
+    },
+    {
+      "id": 58,
+      "name": "Super Famicom",
+      "slug": "sfam"
     }
   ]
 }

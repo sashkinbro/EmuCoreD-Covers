@@ -1,7 +1,7 @@
 # Nine Nintendo platform pipeline
 
 `multiplatform_covers.py` exhaustively pages IGDB by increasing ID, round robin across
-Nintendo DS (20), Nintendo 3DS/New Nintendo 3DS (37/137), GameCube (21), Wii (5), GBA (24), GB (33),
+Nintendo DS/DSi (20/159), Nintendo 3DS/New Nintendo 3DS (37/137), GameCube (21), Wii (5), GBA (24), GB (33),
 GBC (22), NES/Family Computer (18/99) and SNES/Super Famicom (19/58). IDs were checked against the live IGDB platforms
 endpoint. The separate original combined index and assets remain available.
 
@@ -26,6 +26,7 @@ python tools/multiplatform_covers.py deduplicate-legacy
 python tools/multiplatform_covers.py validate
 python tools/multiplatform_covers.py contact-sheet
 python tools/multiplatform_selftest.py
+python tools/multiplatform_covers.py scope
 ```
 
 The private configuration must export `TWITCH_CLIENT_ID` and
@@ -100,3 +101,11 @@ index references to artifacts outside that commit. Revalidate the staged index,
 not just the changing working copy. Manifest attributes preserve the validated
 snapshot's bytes. Original source images and existing `covers/` assets are never
 rewritten during deduplication.
+`multiplatform_publish.py <platform> ...` automates this sequence only after a
+successful full validation, requiring unchanged index SHA256 values and a clean
+Git staging area. It uses the configured repository/parent author identity,
+pushes each commit separately, verifies remote main, and checkpoints publication.
+
+Exact supplied typography uses the existing Windows Arial/Segoe UI font paths.
+Other systems use the renderer fallback fonts and will generate different bitmap
+digests; original IGDB source digests remain identical.

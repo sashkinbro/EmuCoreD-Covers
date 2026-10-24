@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "total_complete_sets": 20532,
+  "platform_counts": {
+    "nds": 3956,
+    "n3ds": 2193,
+    "gamecube": 905,
+    "wii": 3098,
+    "gba": 2091,
+    "gb": 1449,
+    "gbc": 1390,
+    "nes": 2528,
+    "snes": 2922
+  },
+  "index_sha256": {
+    "nds": "3597f215a367e71593fd4ad5129b1ea2a820e3fe63b5caf239727471185ebb87",
+    "n3ds": "390b8129994a823d872ea19e031e671dda8002298c8317d6cebbe9b1fce3c6bd",
+    "gamecube": "2e23a152855b62a8ccdebab3ac94ffae5573d3c1287de4ad6de28669d951cb7f",
+    "wii": "6223bf524e99f67e41f9a9071be2c3555ac5bca9d53d7310bcd3265287768117",
+    "gba": "739209789cab1701e6823033dcf573661958864e6236548b962ea22245ddc170",
+    "gb": "dda5071405b29897ccfbcccf1cba039be9bf7ebe0e6b43795f9ff6fec3d90153",
+    "gbc": "7ab22985e962d66e72df902ce6000f399079683ced6efd1a2a1b2abb0044482c",
+    "nes": "e8803aec3bfadafa2360f9dacdb9d469a8f97a09a287e663ab9ce206a0671444",
+    "snes": "69103273ccc15482cf494d887b13f6211a7c863e8e82595cfb267131b760b129"
+  },
+  "validated_at": "2026-10-23T21:30:03Z",
+  "checks": [
+    "full_image_decode",
+    "sha256",
+    "original_igdb_source",
+    "exact_platform_membership",
+    "complete_catalog_pagination",
+    "transparent_840x1080_variants",
+    "distinct_light_dark",
+    "ambiguous_title_safety"
+  ]
+}

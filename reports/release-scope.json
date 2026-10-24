@@ -1,0 +1,74 @@
+{
+  "nds": {
+    "complete_sets": 3956,
+    "index_sha256": "3597f215a367e71593fd4ad5129b1ea2a820e3fe63b5caf239727471185ebb87",
+    "referenced_files": 23738,
+    "new_files": 1929,
+    "new_bytes": 3366232,
+    "all_referenced_bytes": 1548125945
+  },
+  "n3ds": {
+    "complete_sets": 2193,
+    "index_sha256": "390b8129994a823d872ea19e031e671dda8002298c8317d6cebbe9b1fce3c6bd",
+    "referenced_files": 13160,
+    "new_files": 0,
+    "new_bytes": 0,
+    "all_referenced_bytes": 882904559
+  },
+  "gamecube": {
+    "complete_sets": 905,
+    "index_sha256": "2e23a152855b62a8ccdebab3ac94ffae5573d3c1287de4ad6de28669d951cb7f",
+    "referenced_files": 5432,
+    "new_files": 0,
+    "new_bytes": 0,
+    "all_referenced_bytes": 367415891
+  },
+  "wii": {
+    "complete_sets": 3098,
+    "index_sha256": "6223bf524e99f67e41f9a9071be2c3555ac5bca9d53d7310bcd3265287768117",
+    "referenced_files": 18590,
+    "new_files": 0,
+    "new_bytes": 0,
+    "all_referenced_bytes": 1267358982
+  },
+  "gba": {
+    "complete_sets": 2091,
+    "index_sha256": "739209789cab1701e6823033dcf573661958864e6236548b962ea22245ddc170",
+    "referenced_files": 12548,
+    "new_files": 0,
+    "new_bytes": 0,
+    "all_referenced_bytes": 803171046
+  },
+  "gb": {
+    "complete_sets": 1449,
+    "index_sha256": "dda5071405b29897ccfbcccf1cba039be9bf7ebe0e6b43795f9ff6fec3d90153",
+    "referenced_files": 8696,
+    "new_files": 0,
+    "new_bytes": 0,
+    "all_referenced_bytes": 541030904
+  },
+  "gbc": {
+    "complete_sets": 1390,
+    "index_sha256": "7ab22985e962d66e72df902ce6000f399079683ced6efd1a2a1b2abb0044482c",
+    "referenced_files": 8342,
+    "new_files": 0,
+    "new_bytes": 0,
+    "all_referenced_bytes": 533460875
+  },
+  "nes": {
+    "complete_sets": 2528,
+    "index_sha256": "e8803aec3bfadafa2360f9dacdb9d469a8f97a09a287e663ab9ce206a0671444",
+    "referenced_files": 15170,
+    "new_files": 15169,
+    "new_bytes": 972184968,
+    "all_referenced_bytes": 975074245
+  },
+  "snes": {
+    "complete_sets": 2922,
+    "index_sha256": "69103273ccc15482cf494d887b13f6211a7c863e8e82595cfb267131b760b129",
+    "referenced_files": 17534,
+    "new_files": 17533,
+    "new_bytes": 1105535739,
+    "all_referenced_bytes": 1108892974
+  }
+}

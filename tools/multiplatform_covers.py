@@ -35,7 +35,7 @@ PLATFORMS = {'nds': (20, 'Nintendo DS'), 'n3ds': (37, 'Nintendo 3DS'),
  'gbc': (22, 'Game Boy Color'), 'nes': (18, 'Nintendo Entertainment System'),
  'snes': (19, 'Super Nintendo Entertainment System')}
 def platform_ids(key):
-    return {'n3ds':(37,137),'nes':(18,99),'snes':(19,58)}.get(key,(PLATFORMS[key][0],))
+    return {'nds':(20,159),'n3ds':(37,137),'nes':(18,99),'snes':(19,58)}.get(key,(PLATFORMS[key][0],))
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT if (ROOT / 'index.min.json').exists() else ROOT / 'covers'
 
@@ -121,6 +121,8 @@ def audit_legacy(args):
 
 def deduplicate_legacy(args):
     removed=0; saved=0; reused_sources=0; reused_sets=0
+    previous_path=args.out/'reports'/'legacy-reuse.json'
+    previous=json.loads(previous_path.read_text(encoding='utf8')) if previous_path.exists() else {}
     for key in ('nds','n3ds'):
         catalog=json.loads((args.out/'catalogs'/(key+'.json')).read_text(encoding='utf8'))
         managed=(args.out/'platforms'/key).resolve()
@@ -146,7 +148,9 @@ def deduplicate_legacy(args):
                     saved+=path.stat().st_size
                     path.unlink()
                     removed+=1
-    atomic_json(args.out/'reports'/'legacy-reuse.json',{'reused_sources':reused_sources,'reused_complete_sets':reused_sets,'duplicate_files_removed':removed,'duplicate_bytes_removed':saved,'original_combined_assets_modified':0})
+    atomic_json(args.out/'reports'/'legacy-reuse.json',{'reused_sources':reused_sources,'reused_complete_sets':reused_sets,'duplicate_files_removed':removed,'duplicate_bytes_removed':saved,
+      'cumulative_duplicate_files_removed':previous.get('cumulative_duplicate_files_removed',previous.get('duplicate_files_removed',0))+removed,
+      'cumulative_duplicate_bytes_removed':previous.get('cumulative_duplicate_bytes_removed',previous.get('duplicate_bytes_removed',0))+saved,'original_combined_assets_modified':0})
     indexes(args)
     print('Removed',removed,'generated duplicates;',saved,'bytes; original assets remain unchanged.',flush=True)
 
@@ -414,8 +418,11 @@ def seed_matches(args):
     if not source or not source.exists():
         return result
     names=defaultdict(set)
-    for key in args.platforms:
-        data=json.loads((args.out/'catalogs'/(key+'.json')).read_text(encoding='utf8'))
+    for key in PLATFORMS:
+        catalog_path=args.out/'catalogs'/(key+'.json')
+        if not catalog_path.exists():
+            continue
+        data=json.loads(catalog_path.read_text(encoding='utf8'))
         for game in data['games']:
             for title in [game['name']]+[a['name'] for a in game.get('alternative_names',[])]:
                 names[(key,normalize(title))].add(game['id'])
@@ -437,7 +444,8 @@ def seed_matches(args):
 
 def indexes(args):
     old=json.loads((args.out/'index.min.json').read_text(encoding='utf8')) if (args.out/'index.min.json').exists() else {}
-    summary={}
+    summary_path=args.out/'reports'/'summary.json'
+    summary=json.loads(summary_path.read_text(encoding='utf8')) if summary_path.exists() else {}
     for key in args.platforms:
         catalog=json.loads((args.out/'catalogs'/(key+'.json')).read_text(encoding='utf8'))
         games={}; titles=defaultdict(set); missing=[]
@@ -486,7 +494,7 @@ def indexes(args):
             for serial,value in old.get('serials',{}).items():
                 match=re.search(r'(\d+)(?:\.jpg)?$',str(value))
                 gid=match.group(1) if match else str(value)
-                is3ds=serial.upper().startswith(('CTR','KTR')) or bool(re.fullmatch(r'[0-9A-Fa-f]{16}',serial))
+                is3ds=serial.upper().startswith(('CTR','KTR')) or (bool(re.fullmatch(r'[0-9A-Fa-f]{16}',serial)) and serial.startswith('0004'))
                 if gid in games and (key=='n3ds')==is3ds:
                     serials[serial]=gid
         # Arrays preserve collisions; singleton map is safe for clients without candidate support.
@@ -594,7 +602,7 @@ def release_scope(args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['catalog','assets','index','validate','contact-sheet','scope','audit-legacy','deduplicate-legacy'])
+    parser.add_argument('command',choices=['catalog','assets','index','validate','contact-sheet','scope','audit-legacy','deduplicate-legacy','seeds'])
     parser.add_argument('--out',type=Path,default=DEFAULT_OUT)
     parser.add_argument('--config',type=Path,default=ROOT/'IGDB'/'config.py')
     parser.add_argument('--seeds',type=Path,default=Path('E:/nINtENDO'))
@@ -607,7 +615,7 @@ def main():
     parser.add_argument('--download-only',action='store_true')
     parser.add_argument('--checkpoint-every',type=int,default=1000)
     args=parser.parse_args()
-    {'catalog':catalog,'assets':assets,'index':indexes,'validate':validate,'contact-sheet':contact_sheet,'scope':release_scope,'audit-legacy':audit_legacy,'deduplicate-legacy':deduplicate_legacy}[args.command](args)
+    {'catalog':catalog,'assets':assets,'index':indexes,'validate':validate,'contact-sheet':contact_sheet,'scope':release_scope,'audit-legacy':audit_legacy,'deduplicate-legacy':deduplicate_legacy,'seeds':seed_matches}[args.command](args)
 
 if __name__=='__main__':
     main()

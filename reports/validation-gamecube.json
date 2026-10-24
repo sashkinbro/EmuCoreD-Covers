@@ -1,13 +1,13 @@
 {
   "passed": true,
-  "total_complete_sets": 605,
+  "total_complete_sets": 905,
   "platform_counts": {
-    "gamecube": 605
+    "gamecube": 905
   },
   "index_sha256": {
-    "gamecube": "6c6ab3a2d2d478765aeb1fb3b5ea355540ebd4ad1c7970cfa3cde17f67cd1ec9"
+    "gamecube": "2e23a152855b62a8ccdebab3ac94ffae5573d3c1287de4ad6de28669d951cb7f"
   },
-  "validated_at": "2026-10-23T20:48:45Z",
+  "validated_at": "2026-10-23T21:30:03Z",
   "checks": [
     "full_image_decode",
     "sha256",

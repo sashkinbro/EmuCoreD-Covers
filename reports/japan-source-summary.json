@@ -1,0 +1,10 @@
+{
+  "nes": {
+    "catalog_games": 2824,
+    "with_cover": 2528
+  },
+  "snes": {
+    "catalog_games": 3096,
+    "with_cover": 2922
+  }
+}

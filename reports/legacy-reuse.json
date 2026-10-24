@@ -1,7 +1,9 @@
 {
-  "reused_sources": 5421,
-  "reused_complete_sets": 5354,
-  "duplicate_files_removed": 16129,
-  "duplicate_bytes_removed": 2166910295,
-  "original_combined_assets_modified": 0
+  "reused_sources": 6056,
+  "reused_complete_sets": 5977,
+  "duplicate_files_removed": 635,
+  "duplicate_bytes_removed": 59074716,
+  "original_combined_assets_modified": 0,
+  "cumulative_duplicate_files_removed": 16764,
+  "cumulative_duplicate_bytes_removed": 2225985011
 }

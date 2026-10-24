@@ -1,10 +1,83 @@
 {
+  "nds": {
+    "catalog_games": 4093,
+    "igdb_cover_available": 3956,
+    "complete_assets": 3956,
+    "missing_igdb_cover": 137,
+    "assets_pending": 0,
+    "serials": 17264,
+    "title_collisions": 79
+  },
+  "n3ds": {
+    "catalog_games": 2265,
+    "igdb_cover_available": 2193,
+    "complete_assets": 2193,
+    "missing_igdb_cover": 72,
+    "assets_pending": 0,
+    "serials": 5856,
+    "title_collisions": 76
+  },
   "gamecube": {
     "catalog_games": 932,
     "igdb_cover_available": 905,
-    "complete_assets": 605,
+    "complete_assets": 905,
     "missing_igdb_cover": 27,
-    "assets_pending": 300,
-    "serials": 0
+    "assets_pending": 0,
+    "serials": 0,
+    "title_collisions": 18
+  },
+  "wii": {
+    "catalog_games": 3189,
+    "igdb_cover_available": 3098,
+    "complete_assets": 3098,
+    "missing_igdb_cover": 91,
+    "assets_pending": 0,
+    "serials": 0,
+    "title_collisions": 114
+  },
+  "gba": {
+    "catalog_games": 2316,
+    "igdb_cover_available": 2091,
+    "complete_assets": 2091,
+    "missing_igdb_cover": 225,
+    "assets_pending": 0,
+    "serials": 0,
+    "title_collisions": 34
+  },
+  "gb": {
+    "catalog_games": 1503,
+    "igdb_cover_available": 1449,
+    "complete_assets": 1449,
+    "missing_igdb_cover": 54,
+    "assets_pending": 0,
+    "serials": 0,
+    "title_collisions": 41
+  },
+  "gbc": {
+    "catalog_games": 1471,
+    "igdb_cover_available": 1390,
+    "complete_assets": 1390,
+    "missing_igdb_cover": 81,
+    "assets_pending": 0,
+    "serials": 0,
+    "title_collisions": 17
+  },
+  "nes": {
+    "catalog_games": 2824,
+    "igdb_cover_available": 2528,
+    "complete_assets": 2528,
+    "missing_igdb_cover": 296,
+    "assets_pending": 0,
+    "serials": 0,
+    "title_collisions": 102
+  },
+  "snes": {
+    "catalog_games": 3096,
+    "igdb_cover_available": 2922,
+    "complete_assets": 2922,
+    "missing_igdb_cover": 174,
+    "assets_pending": 0,
+    "serials": 0,
+    "title_collisions": 72
   }
 }
